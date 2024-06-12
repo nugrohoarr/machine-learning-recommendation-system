@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development files
+venv/
+.vscode/
+
+# Environment variables file
+.env
+
+# SQLAlchemy migration files
+/migrations/
+migration*.py
+migration*.ini
+
+# Ignore SQLite database file
+*.sqlite3
