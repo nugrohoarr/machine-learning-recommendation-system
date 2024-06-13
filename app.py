@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 import numpy as np
 import pandas as pd
+from tensorflow.keras.models import load_model
 from services.near_services import find_nearest_places  # Import find_nearest_places function
 from services.selfservice_services import find_nearest_self_service_places  # Import find_nearest_self_service_places function
 from services.express_services import find_nearest_express_places
+from services.service import recommendation_system
 
 app = Flask(__name__)
 
@@ -21,6 +23,20 @@ def get_laundry_detail(id):
     result = laundry_data.iloc[id].to_dict()
     return jsonify(result)
 
+@app.route('/recommend/service', methods=['POST'])
+def recommend_service():
+    data = request.json
+    user_location = np.array(data['user_location'])
+    selected_service = data['selected_service']
+
+    if selected_service not in laundry_data.columns:
+        return jsonify({"error": f"Service '{selected_service}' not found"}), 400
+
+    model = load_model('models/model_service.h5')
+    recommended_places = recommendation_system(user_location[0], user_location[1], selected_service, laundry_data, model)
+    result = recommended_places.to_dict(orient='records')
+
+    return jsonify(result)
 
 @app.route('/recommend/express', methods=['POST'])
 def recommend_express():
